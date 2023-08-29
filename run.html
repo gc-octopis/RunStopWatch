@@ -36,7 +36,7 @@
             height: 240px;
         }
 
-        /*import code*/
+        /*style below are copied from https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API/Taking_still_photos#demo*/
         #video {
             border: 1px solid black;
             box-shadow: 2px 2px 3px black;
@@ -107,9 +107,6 @@
     }
 
     function recover() {
-        // files = fetch("readPNG.php")
-        //     .then(r => { return r.text() })
-        //     .then(r => { return  r; });
 
         files.forEach(name => {
             obj = document.createElement("div");
@@ -182,7 +179,8 @@
         }
     });
 
-    //import code
+    // code below are copied from https://developer.mozilla.org/en-US/docs/Web/API/Media_Capture_and_Streams_API/Taking_still_photos#demo
+    // in order to use webcam
 
 
     // The width and height of the captured photo. We will set the
