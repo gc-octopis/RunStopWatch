@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>終點計時</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Ubuntu Mono', monospace;
+            display: flex;
+        }
+
+        .right {
+            display: block;
+        }
+
+        #obj {
+            display: flex;
+            align-items: center;
+        }
+
+        .timeCodes {
+            width: auto;
+        }
+
+        .bigDisplay {
+            width: 320px;
+            height: 240px;
+        }
+
+        /*import code*/
+        #video {
+            border: 1px solid black;
+            box-shadow: 2px 2px 3px black;
+            width: 320px;
+            height: 240px;
+        }
+
+        #photo {
+            width: 160px;
+            height: 120px;
+        }
+
+        #canvas {
+            display: none;
+        }
+
+        .camera {
+            width: 340px;
+            display: inline-block;
+        }
+
+        #startbutton {
+            display: block;
+            position: relative;
+            margin-left: auto;
+            margin-right: auto;
+            bottom: 32px;
+            background-color: rgba(0, 150, 0, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+            box-shadow: 0px 0px 1px 2px rgba(0, 0, 0, 0.2);
+            font-size: 14px;
+            font-family: "Lucida Grande", "Arial", sans-serif;
+            color: rgba(255, 255, 255, 1);
+        }
+    </style>
+    <script src="readPNG.php"></script>
+
+</head>
+
+<body>
+    <div class="timeCodes"></div>
+</body>
+<script>
+    function create(name) {
+        obj = document.createElement("div");
+        obj.id = "obj";
+        timeObj = document.createElement("div");
+        time = name.replace(/_/gi, ":");
+        timeObj.innerHTML = time;
+
+        picObj = document.createElement("img");
+        picObj.id = "photo";
+        picObj.src = "run/" + name + ".png";
+
+        inputObj = document.createElement("input");
+        inputObj.id = "idNum";
+        inputObj.setAttribute("onfocus", "findInput();")
+
+        obj.appendChild(timeObj);
+        obj.appendChild(picObj);
+        obj.appendChild(inputObj);
+        document.querySelector(".timeCodes").appendChild(obj);
+    }
+
+
+    function recover() {
+        // files = fetch("readPNG.php")
+        //     .then(r => { return r.text() })
+        //     .then(r => { return  r; });
+
+        files.forEach(create);
+        var l;
+        function update() {
+            delete files;
+            document.querySelector("head script").remove();
+            el = document.createElement("script");
+            el.src = "readPNG.php";
+            document.head.appendChild(el);
+            if (l != files.length) {
+                for (let i = l; i < files.length; i++) {
+                    create(files[i]);
+                }
+                l = files.length;
+            }
+            setTimeout(update, 100);
+        }
+        update();
+        reinput();
+        inputTarget(0);
+
+    }
+    window.addEventListener("load", recover, false);
+
+
+    var objIndex = 0;
+    function inputTarget(direction) {
+        if (direction == "up") {
+            if (objIndex <= 0) {
+                return "already top!!!";
+            }
+            objIndex -= 1;
+        } else if (direction == "down") {
+            if (objIndex >= files.length - 1) {
+                return "already bottom!!!";
+            }
+            objIndex += 1;
+        }
+        var inputTags = document.querySelectorAll("#obj input");
+
+        inputTags.forEach(e => {
+            var img = e.closest("#obj").querySelector("img");
+            img.style.width = "160px";
+            img.style.height = "120px";
+        });
+
+        inputTags[objIndex].select();
+        inputTags[objIndex].focus();
+        var img = inputTags[objIndex].closest("#obj").querySelector("img");
+        img.style.width = "320px";
+        img.style.height = "240px";
+
+        const y = img.getBoundingClientRect().top + window.scrollY;
+        console.log(y);
+        window.scroll({
+            top: y ,
+            behavior: 'smooth'
+        });
+
+    }
+
+    function findInput() {
+        var inputTags = document.querySelectorAll("#obj input");
+        for (let i = 0; i < inputTags.length; i++){
+            if (inputTags[i]==event.target){
+                objIndex = i;
+                inputTarget(0);
+                return i;
+            }
+        }
+
+    }
+
+    function sendData(){
+        var data = {time:[], idNum:[]};
+        document.querySelectorAll("#obj div").forEach(e=>{
+            data.time.push(e.innerHTML);
+        });
+
+        document.querySelectorAll("#obj input").forEach(e=>{
+            data.idNum.push(e.value);
+        });
+
+        var form = new FormData();
+        form.append("Data", JSON.stringify(data));
+
+        fetch("runSend.php", {
+            method:"POST",
+            body: form
+        });
+    }
+
+    function reinput(){
+        fetch("data.json")
+            .then(r => r.json())
+            .then(r =>{
+                document.querySelectorAll("input").forEach((j,k) => {
+                    j.value = r.idNum[k];
+                });
+            })
+    }
+
+    window.addEventListener("keyup", e => {
+        if (e.keyCode === 38) {
+            inputTarget("up");
+        }
+
+        if (e.keyCode === 40) {
+            inputTarget("down");
+        }
+
+        if (e.keyCode === 13) {
+            sendData();
+        }
+    })
+</script>
+
+</html>

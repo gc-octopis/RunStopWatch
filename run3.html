@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>終點計時</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Ubuntu+Mono&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Ubuntu Mono', monospace;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        table,
+        tr,
+        th {
+            border: 2px solid black;
+        }
+
+        tr:nth-child(even) {
+            background-color: #0000ff50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="VII">
+        <table>
+            <tr>
+                <th>七年級組</th>
+            </tr>
+        </table>
+    </div>
+    <div class="VIII">
+        <table>
+            <tr>
+                <th>八年級組</th>
+            </tr>
+        </table>
+    </div>
+    <div class="IX">
+        <table>
+            <tr>
+                <th>九年級組</th>
+            </tr>
+        </table>
+    </div>
+    <div class="X">
+        <table>
+            <tr>
+                <th>十年級組</th>
+            </tr>
+        </table>
+    </div>
+    <div class="teacher">
+        <table>
+            <tr>
+                <th>教師組</th>
+            </tr>
+        </table>
+    </div>
+    <div class="sp">
+        <table>
+            <tr>
+                <th>特教組</th>
+            </tr>
+        </table>
+    </div>
+</body>
+<script>
+    function copyText() {
+        document.querySelectorAll("th").forEach(e => { e.style.color = "#000000"; });
+        var text = event.target;
+        text.style.color = "#FF0000";
+        navigator.clipboard.writeText(text.innerHTML);
+
+    }
+
+
+    fetch("data.json")
+        .then(r => r.json())
+        .then(j => {
+            console.log(j);
+            for (let i = 0; i < j.time.length; i++) {
+                tr = document.createElement("tr");
+                tr.innerHTML = "<th>" + j.idNum[i] + "</th><th>" + j.time[i] + "</th>";
+                tr.querySelectorAll("th")[1].setAttribute("onclick", "copyText();")
+                if (j.idNum[i].length == 5 || j.idNum[i].length == 3 || j.idNum[i] == "#605") {
+                    document.querySelector(".sp table").appendChild(tr);
+                } else if (j.idNum[i].length == 4) {
+                    document.querySelector(".teacher table").appendChild(tr);
+                } else {
+                    console.log(j.idNum[i].slice(0, 4));
+                    if (j.idNum[i].slice(0, 4) == "1111" || j.idNum[i].slice(0, 4) == "1112" || j.idNum[i].slice(0, 4) == "1113") {
+                        document.querySelector(".VII table").appendChild(tr);
+                    } else if (j.idNum[i].slice(0, 4) == "1101" || j.idNum[i].slice(0, 4) == "1102" || j.idNum[i].slice(0, 4) == "1103") {
+                        document.querySelector(".VIII table").appendChild(tr);
+                    } else if (j.idNum[i].slice(0, 3) == "109") {
+                        document.querySelector(".IX table").appendChild(tr);
+                    } else if (j.idNum[i].slice(0, 4) == "1114" || j.idNum[i].slice(0, 4) == "1115" || j.idNum[i].slice(0, 4) == "1116") {
+                        document.querySelector(".X table").appendChild(tr);
+                    }
+                }
+            }
+        });
+</script>
+
+</html>
